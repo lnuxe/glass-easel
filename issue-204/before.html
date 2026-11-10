@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Issue #204 - WXS scope vs local scope: BEFORE fix</title>
+<style>
+  * { box-sizing:border-box; }
+  body { margin:0; width:1000px; height:780px; overflow:hidden; background:#0f172a; color:#e2e8f0;
+         font-family:-apple-system,"Helvetica Neue",Arial,sans-serif; }
+  .wrap { padding:14px 18px; }
+  h1 { margin:0 0 3px; font-size:18px; }
+  .sub { color:#94a3b8; font-size:12px; margin-bottom:10px; }
+  .banner { display:flex; align-items:center; gap:10px; background:#f871711f; border:1px solid #f87171;
+            border-radius:7px; padding:7px 11px; margin-bottom:10px; }
+  .banner b { color:#f87171; font-size:14px; }
+  .grid { display:flex; gap:12px; align-items:flex-start; }
+  .card { background:#1e293b; border:1px solid #334155; border-radius:7px; padding:9px 11px; }
+  .left { width:352px; flex:none; }
+  .right { flex:1; min-width:0; }
+  .card h2 { margin:0 0 5px; font-size:11px; color:#93c5fd; text-transform:uppercase; letter-spacing:.9px; }
+  pre { margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:10.5px; line-height:1.36;
+        white-space:pre-wrap; word-break:break-word; }
+  .kv { font-family:ui-monospace,Menlo,monospace; font-size:12.5px; margin:3px 0; }
+  .ok{color:#4ade80} .bad{color:#f87171} .dim{color:#94a3b8}
+  table.m{ width:100%; border-collapse:collapse; font-family:ui-monospace,Menlo,monospace; font-size:11px; }
+  table.m td { padding:2px 4px; border-bottom:1px solid #263449; vertical-align:top; }
+  table.m td:first-child { color:#94a3b8; width:14%; }
+</style></head><body><div class="wrap">
+  <h1>Issue #204 - WXS scope vs local scope: BEFORE fix</h1>
+  <div class="sub">wechat-miniprogram/glass-easel &middot; glass-easel-template-compiler &middot; issue #204 &middot; unedited command output</div>
+  <div class="banner"><b>FAIL ({{item}} -&gt; local wx:for-item scope, index 1)</b><span class="dim">$ cargo test --test scopes</span></div>
+  <div class="grid">
+    <div class="card left">
+      <h2>Template</h2>
+      <pre>&lt;wxs module="item"&gt;exports.v = 1&lt;/wxs&gt;
+&lt;view wx:for="{{list}}" hidden="{{item}}" idxref="{{index}}" /&gt;</pre>
+      <h2 style="margin-top:8px">Scope chain</h2>
+      
+      <table class="m">
+        <tr><td>[0]</td><td>&lt;wxs module="item"&gt;<br><span class="dim">file-global</span></td></tr>
+        <tr><td>[1]</td><td>wx:for-item="item"</td></tr>
+        <tr><td>[2]</td><td>wx:for-index="index"</td></tr>
+      </table>
+      <h2 style="margin-top:8px">Resolution of {{item}}</h2>
+      <div class="kv">ScopeRef index = <span class="bad">1</span></div>
+      <div class="kv"><span class="bad">&#10007; local scope shadows the WXS module</span></div>
+    </div>
+    <div class="card right">
+      <h2>Verbatim test output</h2>
+      <pre>    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.53s
+     Running tests/scopes.rs (/private/tmp/ge-before-204/target/debug/deps/scopes-361840c444361aa6)
+
+running 2 tests
+test inner_local_scope_still_wins_over_outer_local_scope ... ok
+test wxs_module_scope_wins_over_local_scope ... FAILED
+
+failures:
+
+---- wxs_module_scope_wins_over_local_scope stdout ----
+
+thread 'wxs_module_scope_wins_over_local_scope' (2283973) panicked at glass-easel-template-compiler/tests/scopes.rs:81:5:
+assertion `left == right` failed
+  left: 1
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    wxs_module_scope_wins_over_local_scope
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test scopes`
+</pre>
+      
+    </div>
+  </div>
+</div></body></html>
