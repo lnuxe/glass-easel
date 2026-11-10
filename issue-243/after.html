@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Issue #243 - attributes that expect a data binding: AFTER</title><style>*{box-sizing:border-box}body{margin:0;width:1000px;height:780px;overflow:hidden;background:#0f172a;color:#e2e8f0;font-family:-apple-system,"Helvetica Neue",Arial,sans-serif}.wrap{padding:13px 16px}h1{margin:0 0 3px;font-size:17.5px}.sub{color:#94a3b8;font-size:11.5px;margin-bottom:9px}.banner{display:flex;align-items:center;gap:10px;background:#4ade801f;border:1px solid #4ade80;border-radius:7px;padding:6px 10px;margin-bottom:9px}.banner b{color:#4ade80;font-size:13.5px}.grid{display:flex;gap:11px;align-items:flex-start}.card{background:#1e293b;border:1px solid #334155;border-radius:7px;padding:8px 10px}.left{width:436px;flex:none}.right{flex:1;min-width:0}.card h2{margin:0 0 5px;font-size:10.5px;color:#93c5fd;text-transform:uppercase;letter-spacing:.9px}pre{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9.6px;line-height:1.3;white-space:pre-wrap;word-break:break-word}.dim{color:#94a3b8}.ok{color:#4ade80}.bad{color:#f87171}table.m{width:100%;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace;font-size:10px}table.m td{padding:2px 4px;border-bottom:1px solid #263449;vertical-align:top}table.m td:first-child{color:#cbd5e1;width:52%}table.m tr:first-child td{color:#94a3b8;text-transform:uppercase;font-size:9px;letter-spacing:.6px}.src{word-break:break-all}</style></head><body><div class="wrap"><h1>Issue #243 - attributes that expect a data binding: AFTER</h1><div class="sub">wechat-miniprogram/glass-easel &middot; glass-easel-template-compiler &middot; issue #243 &middot; warnings reported by TmplGroup::add_tmpl, unedited</div><div class="banner"><b>5 wrong forms warn, 4 legitimate forms stay silent</b><span class="dim">cargo test --test bindings: 5 passed</span></div><div class="grid"><div class="card left"><h2>Warning per template</h2><table class="m"><tr><td>template</td><td>warnings</td></tr><tr><td class="src">&lt;view hidden="true" /&gt;</td><td><span class="ok">BooleanAttributeWithStaticValue</span></td></tr><tr><td class="src">&lt;view hidden="false" /&gt;</td><td><span class="ok">BooleanAttributeWithStaticValue</span></td></tr><tr><td class="src">&lt;checkbox checked="true" /&gt;</td><td><span class="ok">BooleanAttributeWithStaticValue</span></td></tr><tr><td class="src">&lt;view class:red="true" /&gt;</td><td><span class="ok">ExpectsDataBinding</span></td></tr><tr><td class="src">&lt;view model:value="text" /&gt;</td><td><span class="ok">ExpectsDataBinding</span></td></tr><tr><td class="src">&lt;view hidden="{{ flag }}" /&gt;</td><td><span class="dim">none</span></td></tr><tr><td class="src">&lt;view hidden /&gt;</td><td><span class="dim">none</span></td></tr><tr><td class="src">&lt;view class:red="{{ flag }}" model:value="{{ text }}" /&gt;</td><td><span class="dim">none</span></td></tr><tr><td class="src">&lt;view class="a" data-flag="false" mode="false" /&gt;</td><td><span class="dim">none</span></td></tr></table></div><div class="card right"><h2>Verbatim probe output (case lines)</h2><pre>&lt;view hidden="true" /&gt;
+    -&gt; warnings: ["this boolean attribute expects a data binding, since a non-empty static value is always truthy"]
+&lt;view hidden="false" /&gt;
+    -&gt; warnings: ["this boolean attribute expects a data binding, since a non-empty static value is always truthy"]
+&lt;checkbox checked="true" /&gt;
+    -&gt; warnings: ["this boolean attribute expects a data binding, since a non-empty static value is always truthy"]
+&lt;view class:red="true" /&gt;
+    -&gt; warnings: ["this attribute expects a data binding, since a static value is ignored"]
+&lt;view model:value="text" /&gt;
+    -&gt; warnings: ["this attribute expects a data binding, since a static value is ignored"]
+&lt;view hidden="{{ flag }}" /&gt;
+    -&gt; warnings: []
+&lt;view hidden /&gt;
+    -&gt; warnings: []
+&lt;view class:red="{{ flag }}" model:value="{{ text }}" /&gt;
+    -&gt; warnings: []
+&lt;view class="a" data-flag="false" mode="false" /&gt;
+    -&gt; warnings: []</pre><h2 style="margin-top:7px">cargo test --test bindings</h2><pre>test class_colon_and_model_attribute_with_static_value_warn ... ok
+test boolean_attribute_with_static_value_warns ... ok
+test legitimate_static_values_do_not_warn ... ok
+test data_bindings_do_not_warn ... ok
+test warnings_do_not_change_the_compiled_output ... ok
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s</pre></div></div></div></body></html>
